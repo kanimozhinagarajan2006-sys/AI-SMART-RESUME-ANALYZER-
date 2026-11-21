@@ -3,7 +3,7 @@
 # Complete Professional Version
 # ==========================================
 
-!pip install -q gradio pymupdf scikit-learn reportlab
+
 
 import gradio as gr
 import fitz
