@@ -741,8 +741,6 @@ def check_job_description(file_path, job_description):
     }}
     </style>
     """
-
-
 # ==========================================
 # 11. GRADIO INTERFACE
 # ==========================================
@@ -774,7 +772,7 @@ with gr.Blocks(
     title="AI Smart Resume Analyzer"
 ) as demo:
 
-    gr.HTML("""
+gr.HTML("""
     <div id="main-title">
       <h1>AI SMART RESUME ANALYZER</h1>
       <p>Resume Analysis | ATS Score | Job Matching</p>
