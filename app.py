@@ -347,13 +347,13 @@ def create_pdf_report(
 def dashboard_html(
     role, match, ats, found, missing, suggestions
 ):
-
-    available_badges = "".join(
+  
+available_badges = "".join(
         f'<span class="badge green">{html.escape(s)}</span>'
         for s in found
     )
-
-    missing_badges = "".join(
+    
+ missing_badges = "".join(
         f'<span class="badge red">{html.escape(s)}</span>'
         for s in missing
     )
@@ -648,14 +648,14 @@ def check_job_description(file_path, job_description):
     ]
 
     matched_badges = "".join(
-        f'<span class="badge green">{html.escape(s)}</span>'
-        for s in matched
-    )
+    f'<span class="badge green" style="color:#166534 !important;">{html.escape(s)}</span>'
+    for s in matched
+)
 
-    missing_badges = "".join(
-        f'<span class="badge red">{html.escape(s)}</span>'
-        for s in missing
-    )
+   missing_badges = "".join(
+    f'<span class="badge red" style="color:#991B1B !important;">{html.escape(s)}</span>'
+    for s in missing
+)
 
     return f"""
     <div style="
