@@ -746,7 +746,7 @@ def check_job_description(file_path, job_description):
 # ==========================================
 # 11. GRADIO INTERFACE
 # ==========================================
-custom_css = """
+ custom_css = """
 .gradio-container {
     font-family: Arial, sans-serif;
 }
