@@ -765,7 +765,6 @@ button.primary {
     color: black!;
 }
 """
-
 with gr.Blocks(
     theme=gr.themes.Soft(
         primary_hue="blue",
