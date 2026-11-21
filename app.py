@@ -342,7 +342,6 @@ def create_pdf_report(
 # ==========================================
 # 8. PROFESSIONAL DASHBOARD
 # ==========================================
-
 def dashboard_html(
     role, match, ats, found, missing, suggestions
 ):
@@ -475,6 +474,7 @@ def dashboard_html(
     }}
     </style>
     """
+
 
 
 # ==========================================
