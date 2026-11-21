@@ -1,4 +1,5 @@
 gradio
-pymupdf
+PyMuPDF
 scikit-learn
+pandas
 reportlab
