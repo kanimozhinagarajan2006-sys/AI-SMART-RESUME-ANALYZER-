@@ -366,7 +366,7 @@ def dashboard_html(
 
       <div style="
         background:linear-gradient(120deg,#172554,#2563EB);
-        color:white; padding:25px; border-radius:16px;">
+        color:black; padding:25px; border-radius:16px;">
 
         <h1 style="margin:0;">AI Resume Dashboard</h1>
         <p style="margin-bottom:0;">
@@ -544,7 +544,7 @@ def analyze_resume(file_path):
 
       <div style="
         background:linear-gradient(120deg,#173B70,#2563EB);
-        color:white;padding:23px;">
+        color:black;padding:23px;">
 
         <h2 style="margin:0;">Resume Analysis Report</h2>
         <p>Detailed Resume Evaluation</p>
@@ -754,14 +754,14 @@ custom_css = """
 #main-title {
     text-align: center;
     background: linear-gradient(120deg,#172554,#2563EB);
-    color: white;
+    color: black;
     padding: 25px;
     border-radius: 15px;
 }
 
 button.primary {
     background: #2563EB !important;
-    color: white !important;
+    color: black!;
 }
 """
 
