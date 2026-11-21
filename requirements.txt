@@ -1,0 +1,4 @@
+gradio
+pymupdf
+scikit-learn
+reportlab
