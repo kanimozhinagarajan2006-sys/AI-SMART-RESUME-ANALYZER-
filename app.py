@@ -1,6 +1,6 @@
 # ==========================================
 # AI SMART RESUME ANALYZER & JOB MATCHER
-# Complete Professional Version
+# Complete Corrected Version
 # ==========================================
 
 import gradio as gr
@@ -15,10 +15,17 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle
 )
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import (
+    getSampleStyleSheet,
+    ParagraphStyle
+)
 from reportlab.lib.enums import TA_CENTER
 
 
@@ -36,7 +43,10 @@ skills_list = [
 job_roles = {
     "Data Analyst": "Python SQL Data Analysis Power BI",
     "Python Developer": "Python SQL Programming",
-    "ML Engineer": "Python Machine Learning Deep Learning TensorFlow Scikit-learn",
+    "ML Engineer": (
+        "Python Machine Learning Deep Learning "
+        "TensorFlow Scikit-learn"
+    ),
     "Web Developer": "HTML CSS JavaScript"
 }
 
@@ -44,8 +54,11 @@ required = {
     "Data Analyst": ["Python", "SQL", "Power BI"],
     "Python Developer": ["Python", "SQL"],
     "ML Engineer": [
-        "Python", "Machine Learning", "Deep Learning",
-        "TensorFlow", "Scikit-learn"
+        "Python",
+        "Machine Learning",
+        "Deep Learning",
+        "TensorFlow",
+        "Scikit-learn"
     ],
     "Web Developer": ["HTML", "CSS", "JavaScript"]
 }
@@ -61,14 +74,11 @@ def extract_resume_text(file_path):
         return ""
 
     try:
-        document = fitz.open(file_path)
+        with fitz.open(file_path) as document:
+            text = ""
 
-        text = ""
-
-        for page in document:
-            text += page.get_text() + "\n"
-
-        document.close()
+            for page in document:
+                text += page.get_text() + "\n"
 
         return text
 
@@ -88,7 +98,11 @@ def extract_skills(text):
 
     for skill in skills_list:
 
-        pattern = r"(?<!\w)" + re.escape(skill.lower()) + r"(?!\w)"
+        pattern = (
+            r"(?<!\w)"
+            + re.escape(skill.lower())
+            + r"(?!\w)"
+        )
 
         if re.search(pattern, text_lower):
             found_skills.append(skill)
@@ -110,7 +124,8 @@ def recommend_job_role(found_skills):
     roles = list(job_roles.keys())
 
     descriptions = [
-        job_roles[role] for role in roles
+        job_roles[role]
+        for role in roles
     ]
 
     vectorizer = TfidfVectorizer()
@@ -129,7 +144,8 @@ def recommend_job_role(found_skills):
     best_role = roles[best_index]
 
     match_percentage = round(
-        scores[best_index] * 100, 2
+        scores[best_index] * 100,
+        2
     )
 
     return best_role, match_percentage
@@ -147,8 +163,11 @@ def calculate_ats_score(text, found_skills):
         score += 20
 
     sections = [
-        "education", "experience",
-        "skills", "projects", "contact"
+        "education",
+        "experience",
+        "skills",
+        "projects",
+        "contact"
     ]
 
     text_lower = text.lower()
@@ -171,22 +190,24 @@ def get_resume_suggestions(text, found_skills):
 
     suggestions = []
 
+    text_lower = text.lower()
+
     if len(text.split()) < 50:
         suggestions.append(
             "Add more relevant details to your resume."
         )
 
-    if "education" not in text.lower():
+    if "education" not in text_lower:
         suggestions.append(
             "Add an Education section."
         )
 
-    if "projects" not in text.lower():
+    if "projects" not in text_lower:
         suggestions.append(
             "Include your academic or personal projects."
         )
 
-    if "experience" not in text.lower():
+    if "experience" not in text_lower:
         suggestions.append(
             "Add internship or practical experience if available."
         )
@@ -255,25 +276,33 @@ def create_pdf_report(
 
     data = [
         ["Analysis", "Result"],
-        ["Recommended Job Role", role],
+        ["Recommended Job Role", html.escape(role)],
         ["Job Match Percentage", str(match) + "%"],
         ["ATS Score", str(ats) + "%"],
         ["Total Skills Found", str(len(found))]
     ]
 
-    table = Table(data, colWidths=[220, 220])
+    table = Table(
+        data,
+        colWidths=[220, 220]
+    )
 
     table.setStyle(
         TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0),
              colors.HexColor("#173B70")),
+
             ("TEXTCOLOR", (0, 0), (-1, 0),
              colors.white),
+
             ("TEXTCOLOR", (0, 1), (-1, -1),
              colors.black),
-            ("GRID", (0, 0), (-1, -1), 0.5,
-             colors.grey),
+
+            ("GRID", (0, 0), (-1, -1),
+             0.5, colors.grey),
+
             ("PADDING", (0, 0), (-1, -1), 10),
+
             ("BACKGROUND", (0, 1), (-1, -1),
              colors.HexColor("#EFF5FF"))
         ])
@@ -284,7 +313,10 @@ def create_pdf_report(
     story.append(Spacer(1, 20))
 
     story.append(
-        Paragraph("Available Skills", styles["Heading2"])
+        Paragraph(
+            "Available Skills",
+            styles["Heading2"]
+        )
     )
 
     story.append(
@@ -297,7 +329,10 @@ def create_pdf_report(
     story.append(Spacer(1, 15))
 
     story.append(
-        Paragraph("Missing Skills", styles["Heading2"])
+        Paragraph(
+            "Missing Skills",
+            styles["Heading2"]
+        )
     )
 
     story.append(
@@ -310,7 +345,10 @@ def create_pdf_report(
     story.append(Spacer(1, 15))
 
     story.append(
-        Paragraph("Improvement Suggestions", styles["Heading2"])
+        Paragraph(
+            "Improvement Suggestions",
+            styles["Heading2"]
+        )
     )
 
     for item in suggestions:
@@ -343,17 +381,22 @@ def create_pdf_report(
 # ==========================================
 # 8. PROFESSIONAL DASHBOARD
 # ==========================================
+
 def dashboard_html(
     role, match, ats, found, missing, suggestions
 ):
-  
-available_badges = "".join(
-        f'<span class="badge green">{html.escape(s)}</span>'
+
+    available_badges = "".join(
+        f'<span class="badge green" '
+        f'style="color:#166534 !important;">'
+        f'{html.escape(s)}</span>'
         for s in found
     )
-    
- missing_badges = "".join(
-        f'<span class="badge red">{html.escape(s)}</span>'
+
+    missing_badges = "".join(
+        f'<span class="badge red" '
+        f'style="color:#991B1B !important;">'
+        f'{html.escape(s)}</span>'
         for s in missing
     )
 
@@ -363,80 +406,109 @@ available_badges = "".join(
     )
 
     return f"""
-    <div style="font-family:Arial; padding:18px; color:#000000;">
+    <div style="
+        font-family:Arial;
+        padding:18px;
+        color:#000000;
+    ">
 
       <div style="
         background:linear-gradient(120deg,#172554,#2563EB);
-        color:#000000; padding:25px; border-radius:16px;">
+        color:#000000;
+        padding:25px;
+        border-radius:16px;
+      ">
 
         <h1 style="margin:0;color:#000000;">
-        AI Resume Dashboard
+            AI Resume Dashboard
         </h1>
 
         <p style="margin-bottom:0;color:#000000;">
-        Smart Resume Analysis & Job Recommendation
+            Smart Resume Analysis & Job Recommendation
         </p>
+
       </div>
 
       <div style="
         display:grid;
         grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
-        gap:14px; margin-top:20px;">
+        gap:14px;
+        margin-top:20px;
+      ">
 
         <div style="
-          background:#EDE9FE;padding:20px;
-          border-radius:14px;text-align:center;color:#000000;">
-
-          <h2 style="color:#6D28D9;">{ats}%</h2>
-          <b style="color:#000000;">ATS Score</b>
+            background:#EDE9FE;
+            padding:20px;
+            border-radius:14px;
+            text-align:center;
+            color:#000000;
+        ">
+            <h2 style="color:#6D28D9;">{ats}%</h2>
+            <b style="color:#000000;">ATS Score</b>
         </div>
 
         <div style="
-          background:#DBEAFE;padding:20px;
-          border-radius:14px;text-align:center;color:#000000;">
-
-          <h2 style="color:#1D4ED8;">{match}%</h2>
-          <b style="color:#000000;">Job Match</b>
+            background:#DBEAFE;
+            padding:20px;
+            border-radius:14px;
+            text-align:center;
+            color:#000000;
+        ">
+            <h2 style="color:#1D4ED8;">{match}%</h2>
+            <b style="color:#000000;">Job Match</b>
         </div>
 
         <div style="
-          background:#DCFCE7;padding:20px;
-          border-radius:14px;text-align:center;color:#000000;">
-
-          <h2 style="color:#15803D;">{len(found)}</h2>
-          <b style="color:#000000;">Skills Found</b>
+            background:#DCFCE7;
+            padding:20px;
+            border-radius:14px;
+            text-align:center;
+            color:#000000;
+        ">
+            <h2 style="color:#15803D;">{len(found)}</h2>
+            <b style="color:#000000;">Skills Found</b>
         </div>
 
         <div style="
-          background:#FFEDD5;padding:20px;
-          border-radius:14px;text-align:center;color:#000000;">
-
-          <h2 style="color:#C2410C;">{len(missing)}</h2>
-          <b style="color:#000000;">Missing Skills</b>
+            background:#FFEDD5;
+            padding:20px;
+            border-radius:14px;
+            text-align:center;
+            color:#000000;
+        ">
+            <h2 style="color:#C2410C;">{len(missing)}</h2>
+            <b style="color:#000000;">Missing Skills</b>
         </div>
 
       </div>
 
       <div style="
-        background:#F1F5F9;padding:20px;
-        margin-top:20px;border-radius:14px;">
+        background:#F1F5F9;
+        padding:20px;
+        margin-top:20px;
+        border-radius:14px;
+      ">
 
         <h2 style="color:#173B70;">
-        Recommended Job Role
+            Recommended Job Role
         </h2>
 
-        <h2 style="color:#2563EB;">{html.escape(role)}</h2>
+        <h2 style="color:#2563EB;">
+            {html.escape(role)}
+        </h2>
 
       </div>
 
       <div style="margin-top:20px;color:#000000;">
 
-        <h2 style="color:#15803D;">Available Skills</h2>
+        <h2 style="color:#15803D;">
+            Available Skills
+        </h2>
 
         {available_badges if available_badges else "No skills found"}
 
         <h2 style="color:#DC2626;margin-top:20px;">
-        Missing Skills
+            Missing Skills
         </h2>
 
         {missing_badges if missing_badges else "No missing skills"}
@@ -444,19 +516,29 @@ available_badges = "".join(
       </div>
 
       <div style="
-        background:#FFF7ED;padding:20px;
-        margin-top:20px;border-radius:14px;color:#000000;">
+        background:#FFF7ED;
+        padding:20px;
+        margin-top:20px;
+        border-radius:14px;
+        color:#000000;
+      ">
 
         <h2 style="color:#C2410C;">
-        Resume Improvement Suggestions
+            Resume Improvement Suggestions
         </h2>
 
-        <ul style="color:#000000;">{suggestion_items}</ul>
+        <ul style="color:#000000;">
+            {suggestion_items}
+        </ul>
 
       </div>
 
-      <p style="color:#000000;font-size:12px;margin-top:20px;">
-      ATS score and job match are prototype estimates.
+      <p style="
+        color:#000000;
+        font-size:12px;
+        margin-top:20px;
+      ">
+        ATS score and job match are prototype estimates.
       </p>
 
     </div>
@@ -473,16 +555,15 @@ available_badges = "".join(
 
     .green {{
         background:#DCFCE7;
-        color:#166534;
+        color:#166534 !important;
     }}
 
     .red {{
         background:#FEE2E2;
-        color:#991B1B;
+        color:#991B1B !important;
     }}
     </style>
     """
-
 
 
 # ==========================================
@@ -503,7 +584,8 @@ def analyze_resume(file_path):
     if not text.strip():
 
         return (
-            "<h3>Unable to extract text. Please upload a text-based PDF.</h3>",
+            "<h3>Unable to extract text. "
+            "Please upload a text-based PDF.</h3>",
             None,
             "<p>No readable resume text was found.</p>"
         )
@@ -515,28 +597,48 @@ def analyze_resume(file_path):
     ats = calculate_ats_score(text, found)
 
     if role in required:
+
         missing = [
-            skill for skill in required[role]
+            skill
+            for skill in required[role]
             if skill not in found
         ]
+
     else:
         missing = []
 
     suggestions = get_resume_suggestions(
-        text, found
+        text,
+        found
     )
 
     pdf_path = create_pdf_report(
-        role, match, ats, found, missing, suggestions
+        role,
+        match,
+        ats,
+        found,
+        missing,
+        suggestions
     )
 
     dashboard = dashboard_html(
-        role, match, ats, found, missing, suggestions
+        role,
+        match,
+        ats,
+        found,
+        missing,
+        suggestions
     )
 
-    found_text = ", ".join(found) if found else "None"
+    found_text = (
+        ", ".join(found)
+        if found else "None"
+    )
 
-    missing_text = ", ".join(missing) if missing else "None"
+    missing_text = (
+        ", ".join(missing)
+        if missing else "None"
+    )
 
     suggestion_text = "".join(
         f"<li>{html.escape(s)}</li>"
@@ -545,52 +647,81 @@ def analyze_resume(file_path):
 
     report = f"""
     <div style="
-      font-family:Arial;
-      border-radius:15px;
-      overflow:hidden;
-      border:1px solid #DCE5F1;
-      color:#000000;">
+        font-family:Arial;
+        border-radius:15px;
+        overflow:hidden;
+        border:1px solid #DCE5F1;
+        color:#000000;
+    ">
 
       <div style="
         background:linear-gradient(120deg,#173B70,#2563EB);
-        color:#000000;padding:23px;">
+        color:#000000;
+        padding:23px;
+      ">
 
         <h2 style="margin:0;color:#000000;">
-        Resume Analysis Report
+            Resume Analysis Report
         </h2>
 
-        <p style="color:#000000;">Detailed Resume Evaluation</p>
+        <p style="color:#000000;">
+            Detailed Resume Evaluation
+        </p>
 
       </div>
 
-      <div style="padding:22px;background:#F8FAFC;color:#000000;">
+      <div style="
+        padding:22px;
+        background:#F8FAFC;
+        color:#000000;
+      ">
 
         <h3 style="color:#173B70;">
-        Recommended Job Role: {html.escape(role)}
+            Recommended Job Role: {html.escape(role)}
         </h3>
 
-        <p style="color:#000000;"><b>Job Match:</b> {match}%</p>
-        <p style="color:#000000;"><b>ATS Score:</b> {ats}%</p>
-        <p style="color:#000000;"><b>Total Skills Found:</b> {len(found)}</p>
+        <p style="color:#000000;">
+            <b>Job Match:</b> {match}%
+        </p>
+
+        <p style="color:#000000;">
+            <b>ATS Score:</b> {ats}%
+        </p>
+
+        <p style="color:#000000;">
+            <b>Total Skills Found:</b> {len(found)}
+        </p>
 
         <hr>
 
-        <h3 style="color:#15803D;">Available Skills</h3>
-        <p style="color:#000000;">{html.escape(found_text)}</p>
+        <h3 style="color:#15803D;">
+            Available Skills
+        </h3>
 
-        <h3 style="color:#DC2626;">Missing Skills</h3>
-        <p style="color:#000000;">{html.escape(missing_text)}</p>
+        <p style="color:#000000;">
+            {html.escape(found_text)}
+        </p>
+
+        <h3 style="color:#DC2626;">
+            Missing Skills
+        </h3>
+
+        <p style="color:#000000;">
+            {html.escape(missing_text)}
+        </p>
 
         <hr>
 
         <h3 style="color:#C2410C;">
-        Improvement Suggestions
+            Improvement Suggestions
         </h3>
 
-        <ul style="color:#000000;">{suggestion_text}</ul>
+        <ul style="color:#000000;">
+            {suggestion_text}
+        </ul>
 
         <p style="font-size:12px;color:#000000;">
-        Note: ATS score and job match are prototype estimates.
+            Note: ATS score and job match are prototype estimates.
         </p>
 
       </div>
@@ -618,6 +749,7 @@ def check_job_description(file_path, job_description):
         return "<h3>Unable to read the uploaded PDF.</h3>"
 
     try:
+
         vectorizer = TfidfVectorizer()
 
         vectors = vectorizer.fit_transform(
@@ -625,94 +757,119 @@ def check_job_description(file_path, job_description):
         )
 
         similarity = cosine_similarity(
-            vectors[0:1], vectors[1:]
+            vectors[0:1],
+            vectors[1:]
         )[0][0]
 
     except ValueError:
-        return "<h3>Unable to compare the resume and job description.</h3>"
 
-    percentage = round(similarity * 100, 2)
+        return (
+            "<h3>Unable to compare the resume "
+            "and job description.</h3>"
+        )
+
+    percentage = round(
+        similarity * 100,
+        2
+    )
 
     jd_skills = extract_skills(job_description)
 
     resume_skills = extract_skills(resume_text)
 
     matched = [
-        skill for skill in jd_skills
+        skill
+        for skill in jd_skills
         if skill in resume_skills
     ]
 
     missing = [
-        skill for skill in jd_skills
+        skill
+        for skill in jd_skills
         if skill not in resume_skills
     ]
 
     matched_badges = "".join(
-    f'<span class="badge green" style="color:#166534 !important;">{html.escape(s)}</span>'
-    for s in matched
-)
+        f'<span class="badge green" '
+        f'style="color:#166534 !important;">'
+        f'{html.escape(s)}</span>'
+        for s in matched
+    )
 
-   missing_badges = "".join(
-    f'<span class="badge red" style="color:#991B1B !important;">{html.escape(s)}</span>'
-    for s in missing
-)
+    missing_badges = "".join(
+        f'<span class="badge red" '
+        f'style="color:#991B1B !important;">'
+        f'{html.escape(s)}</span>'
+        for s in missing
+    )
 
     return f"""
     <div style="
-      font-family:Arial;
-      border:1px solid #DCE5F1;
-      border-radius:16px;
-      overflow:hidden;
-      color:#000000;">
+        font-family:Arial;
+        border:1px solid #DCE5F1;
+        border-radius:16px;
+        overflow:hidden;
+        color:#000000;
+    ">
 
       <div style="
         background:linear-gradient(120deg,#172554,#2563EB);
-        color:#000000;padding:24px;">
+        color:#000000;
+        padding:24px;
+      ">
 
         <h2 style="margin:0;color:#000000;">
-        Job Description Matching Report
+            Job Description Matching Report
         </h2>
 
-        <p style="color:#000000;">Professional Resume & Job Comparison</p>
+        <p style="color:#000000;">
+            Professional Resume & Job Comparison
+        </p>
 
       </div>
 
-      <div style="padding:22px;background:#F8FAFC;color:#000000;">
+      <div style="
+        padding:22px;
+        background:#F8FAFC;
+        color:#000000;
+      ">
 
         <h2 style="color:#173B70;">
-        Text Similarity: {percentage}%
+            Text Similarity: {percentage}%
         </h2>
 
         <div style="
-          background:#DBEAFE;
-          height:16px;
-          border-radius:20px;
-          overflow:hidden;">
+            background:#DBEAFE;
+            height:16px;
+            border-radius:20px;
+            overflow:hidden;
+        ">
 
           <div style="
             width:{percentage}%;
             background:#2563EB;
             height:16px;
-            border-radius:20px;">
+            border-radius:20px;
+          ">
           </div>
 
         </div>
 
         <p style="color:#000000;font-size:12px;">
-        This percentage represents text similarity,
-        not the probability of getting hired.
+            This percentage represents text similarity,
+            not the probability of getting hired.
         </p>
 
         <hr>
 
         <h3 style="color:#15803D;">
-        Matched Skills ({len(matched)})
+            Matched Skills ({len(matched)})
         </h3>
 
         {matched_badges if matched_badges else "No matching skills found"}
 
         <h3 style="color:#DC2626;margin-top:22px;">
-        Missing Skills ({len(missing)})
+            Missing Skills ({len(missing)})
         </h3>
 
         {missing_badges if missing_badges else "No missing skills found"}
@@ -720,17 +877,26 @@ def check_job_description(file_path, job_description):
         <hr>
 
         <div style="
-          background:#E0F2FE;
-          padding:18px;
-          border-radius:12px;">
+            background:#E0F2FE;
+            padding:18px;
+            border-radius:12px;
+        ">
 
           <h3 style="color:#075985;">
-          Matching Summary
+              Matching Summary
           </h3>
 
-          <p style="color:#000000;">Total Required Skills: {len(jd_skills)}</p>
-          <p style="color:#000000;">Matched Skills: {len(matched)}</p>
-          <p style="color:#000000;">Missing Skills: {len(missing)}</p>
+          <p style="color:#000000;">
+              Total Required Skills: {len(jd_skills)}
+          </p>
+
+          <p style="color:#000000;">
+              Matched Skills: {len(matched)}
+          </p>
+
+          <p style="color:#000000;">
+              Missing Skills: {len(missing)}
+          </p>
 
         </div>
 
@@ -749,12 +915,12 @@ def check_job_description(file_path, job_description):
 
     .green {{
         background:#DCFCE7;
-        color:#166534;
+        color:#166534 !important;
     }}
 
     .red {{
         background:#FEE2E2;
-        color:#991B1B;
+        color:#991B1B !important;
     }}
     </style>
     """
@@ -794,6 +960,7 @@ button.primary {
 }
 """
 
+
 with gr.Blocks(
     theme=gr.themes.Soft(
         primary_hue="blue",
@@ -805,8 +972,13 @@ with gr.Blocks(
 
     gr.HTML("""
     <div id="main-title">
-        <h1 style="color:black;">AI SMART RESUME ANALYZER</h1>
-        <p style="color:black;">Resume Analysis | ATS Score | Job Matching</p>
+        <h1 style="color:black;">
+            AI SMART RESUME ANALYZER
+        </h1>
+
+        <p style="color:black;">
+            Resume Analysis | ATS Score | Job Matching
+        </p>
     </div>
     """)
 
@@ -827,11 +999,15 @@ with gr.Blocks(
             variant="primary"
         )
 
-        gr.Markdown("## Professional Dashboard")
+        gr.Markdown(
+            "## Professional Dashboard"
+        )
 
         dashboard = gr.HTML()
 
-        gr.Markdown("## Resume Analysis Report")
+        gr.Markdown(
+            "## Resume Analysis Report"
+        )
 
         result = gr.HTML()
 
@@ -842,7 +1018,11 @@ with gr.Blocks(
         analyze_button.click(
             fn=analyze_resume,
             inputs=file_input,
-            outputs=[result, pdf_output, dashboard]
+            outputs=[
+                result,
+                pdf_output,
+                dashboard
+            ]
         )
 
     with gr.Tab("Job Description Matching"):
@@ -866,7 +1046,10 @@ with gr.Blocks(
 
         jd_button.click(
             fn=check_job_description,
-            inputs=[file_input, jd_input],
+            inputs=[
+                file_input,
+                jd_input
+            ],
             outputs=jd_result
         )
 
@@ -884,4 +1067,5 @@ with gr.Blocks(
 
 demo.launch(
     server_name="0.0.0.0",
-    server_port=int(os.environ.get("PORT", 10000)))
+    server_port=int(os.environ.get("PORT", 10000))
+)
